@@ -1,5 +1,5 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { CATEGORIES, type Attachment, type Entry, type EntryDraft } from '../types'
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { CATEGORIES, type Attachment, type Category, type Entry, type EntryDraft } from '../types'
 import AttachmentThumb from './AttachmentThumb'
 
 interface Props {
@@ -14,18 +14,44 @@ function today() {
 }
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024
+const DRAFT_KEY = 'keeping-track:new-entry-draft'
+
+function loadDraft(): EntryDraft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    return raw ? (JSON.parse(raw) as EntryDraft) : null
+  } catch {
+    return null
+  }
+}
 
 export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachment }: Props) {
-  const [entryDate, setEntryDate] = useState(initial?.entry_date ?? today())
-  const [category, setCategory] = useState(initial?.category ?? CATEGORIES[0])
-  const [contact, setContact] = useState(initial?.contact ?? '')
-  const [notes, setNotes] = useState(initial?.notes ?? '')
-  const [referenceNumber, setReferenceNumber] = useState(initial?.reference_number ?? '')
-  const [followUp, setFollowUp] = useState(initial?.follow_up ?? '')
+  const draft = initial ? null : loadDraft()
+  const [entryDate, setEntryDate] = useState(initial?.entry_date ?? draft?.entry_date ?? today())
+  const [category, setCategory] = useState<Category>(initial?.category ?? draft?.category ?? CATEGORIES[0])
+  const [contact, setContact] = useState(initial?.contact ?? draft?.contact ?? '')
+  const [notes, setNotes] = useState(initial?.notes ?? draft?.notes ?? '')
+  const [referenceNumber, setReferenceNumber] = useState(initial?.reference_number ?? draft?.reference_number ?? '')
+  const [followUp, setFollowUp] = useState(initial?.follow_up ?? draft?.follow_up ?? '')
   const [newFiles, setNewFiles] = useState<File[]>([])
   const [existingAttachments, setExistingAttachments] = useState(initial?.attachments ?? [])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Only new (unsaved) entries keep a draft — an in-progress edit of an
+  // existing entry always starts from that entry's real saved values.
+  useEffect(() => {
+    if (initial) return
+    const toSave: EntryDraft = {
+      entry_date: entryDate,
+      category,
+      contact,
+      notes,
+      reference_number: referenceNumber,
+      follow_up: followUp,
+    }
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(toSave))
+  }, [initial, entryDate, category, contact, notes, referenceNumber, followUp])
 
   function handleFilePick(e: ChangeEvent<HTMLInputElement>) {
     const picked = Array.from(e.target.files ?? [])
@@ -69,10 +95,16 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
         },
         newFiles,
       )
+      if (!initial) localStorage.removeItem(DRAFT_KEY)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save this entry')
       setSaving(false)
     }
+  }
+
+  function handleCancel() {
+    if (!initial) localStorage.removeItem(DRAFT_KEY)
+    onCancel()
   }
 
   return (
@@ -81,7 +113,7 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-lg font-semibold">{initial ? 'Edit entry' : 'Log an interaction'}</h2>
-            <button type="button" onClick={onCancel} className="text-ink-soft hover:text-ink text-xl leading-none px-1">
+            <button type="button" onClick={handleCancel} className="text-ink-soft hover:text-ink text-xl leading-none px-1">
               ×
             </button>
           </div>
@@ -203,7 +235,7 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
           <div className="flex gap-2 pt-1">
             <button
               type="button"
-              onClick={onCancel}
+              onClick={handleCancel}
               className="flex-1 rounded-lg border border-line text-sm font-medium py-2.5 hover:bg-accent-soft transition-colors"
             >
               Cancel
