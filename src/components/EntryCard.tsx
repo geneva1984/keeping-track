@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Entry } from '../types'
+import AttachmentThumb from './AttachmentThumb'
 
 interface Props {
   entry: Entry
@@ -61,6 +62,14 @@ export default function EntryCard({ entry, onEdit, onDelete, onToggleFollowUp }:
         <p className="text-xs text-ink-soft mt-2">
           Reference: <span className="font-medium text-ink">{entry.reference_number}</span>
         </p>
+      )}
+
+      {entry.attachments.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {entry.attachments.map((a) => (
+            <AttachmentThumb key={a.id} attachment={a} />
+          ))}
+        </div>
       )}
 
       {entry.follow_up && (

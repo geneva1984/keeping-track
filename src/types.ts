@@ -18,6 +18,18 @@ export interface FamilyMembership {
   displayName: string
 }
 
+export interface Attachment {
+  id: string
+  entry_id: string
+  family_id: string
+  storage_path: string
+  file_name: string
+  content_type: string | null
+  uploaded_by: string
+  uploaded_by_name: string
+  created_at: string
+}
+
 export interface Entry {
   id: string
   family_id: string
@@ -33,6 +45,7 @@ export interface Entry {
   updated_by_name: string | null
   created_at: string
   updated_at: string
+  attachments: Attachment[]
 }
 
 export type EntryDraft = {

@@ -88,9 +88,16 @@ entries          (id, family_id, entry_date, category, contact, notes,
 
 - Create or join a family log via share code
 - Log an interaction (date, category, contact, notes, optional reference number, optional follow-up)
+- Photo/document attachments per entry (see below)
 - Timeline, newest first, filterable by category
 - Open follow-ups surfaced in a banner until marked resolved
 - Edit and delete entries
 - Realtime — everyone's timeline updates live as entries are added
 
-Out of scope for v1 (see project brief): notifications/reminders, attachments, multiple parents/cases in the UI, payments, My Aged Care integration.
+Out of scope for v1 (see project brief): notifications/reminders, multiple parents/cases in the UI, payments, My Aged Care integration.
+
+## Attachments
+
+Entries can have photos or PDFs attached (e.g. a photo of a letter, a screenshot of an email). Files live in a private Supabase Storage bucket, isolated per family the same way every other table is — a storage policy checks family membership against the `<family_id>/...` prefix of the file's path, so there's no way to access another family's files even with a direct link. Run [`supabase/migration_002_attachments.sql`](supabase/migration_002_attachments.sql) once (after `schema.sql`) to enable it — same process as the initial schema, paste into SQL Editor and run.
+
+Limits: 10MB per file, images (jpeg/png/webp/heic) and PDFs only. Both are enforced at the Supabase Storage bucket level, not just in the app.

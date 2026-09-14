@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { deleteAttachment, uploadAttachment } from '../lib/attachments'
 import { useFamily } from '../context/FamilyContext'
-import type { Category, Entry, EntryDraft } from '../types'
+import type { Attachment, Category, Entry, EntryDraft } from '../types'
 import Header from '../components/Header'
 import CategoryFilter from '../components/CategoryFilter'
 import FollowUpBanner from '../components/FollowUpBanner'
@@ -24,7 +25,7 @@ export default function Timeline() {
     setLoading(true)
     const { data, error } = await supabase
       .from('entries')
-      .select('*')
+      .select('*, attachments(*)')
       .eq('family_id', familyId)
       .order('entry_date', { ascending: false })
       .order('created_at', { ascending: false })
@@ -49,6 +50,11 @@ export default function Timeline() {
         { event: '*', schema: 'public', table: 'entries', filter: `family_id=eq.${familyId}` },
         () => loadEntries(),
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'attachments', filter: `family_id=eq.${familyId}` },
+        () => loadEntries(),
+      )
       .subscribe()
     return () => {
       supabase.removeChannel(channel)
@@ -64,7 +70,7 @@ export default function Timeline() {
     return list
   }, [entries, categoryFilter, followUpOnly])
 
-  async function handleSave(draft: EntryDraft) {
+  async function handleSave(draft: EntryDraft, newFiles: File[]) {
     if (!familyId) return
     const payload = {
       family_id: familyId,
@@ -75,15 +81,26 @@ export default function Timeline() {
       reference_number: draft.reference_number || null,
       follow_up: draft.follow_up || null,
     }
+    let entryId: string
     if (editingEntry) {
       const { error } = await supabase.from('entries').update(payload).eq('id', editingEntry.id)
       if (error) throw error
+      entryId = editingEntry.id
     } else {
-      const { error } = await supabase.from('entries').insert(payload)
+      const { data, error } = await supabase.from('entries').insert(payload).select('id').single()
       if (error) throw error
+      entryId = data.id
+    }
+    for (const file of newFiles) {
+      await uploadAttachment(familyId, entryId, file)
     }
     setFormOpen(false)
     setEditingEntry(null)
+    await loadEntries()
+  }
+
+  async function handleDeleteAttachment(attachment: Attachment) {
+    await deleteAttachment(attachment.id, attachment.storage_path)
     await loadEntries()
   }
 
@@ -172,6 +189,7 @@ export default function Timeline() {
             setEditingEntry(null)
           }}
           onSave={handleSave}
+          onDeleteAttachment={handleDeleteAttachment}
         />
       )}
     </div>
