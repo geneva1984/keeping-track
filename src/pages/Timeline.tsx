@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { deleteAttachment, uploadAttachment } from '../lib/attachments'
+import { loadFamilyMembers } from '../lib/familyMembers'
 import { useFamily } from '../context/FamilyContext'
-import type { Attachment, Category, Entry, EntryDraft } from '../types'
-import Header from '../components/Header'
+import type { Attachment, Category, Entry, EntryDraft, FamilyMemberInfo } from '../types'
 import CategoryFilter from '../components/CategoryFilter'
 import FollowUpBanner from '../components/FollowUpBanner'
 import EntryCard from '../components/EntryCard'
@@ -12,6 +12,7 @@ import EntryForm from '../components/EntryForm'
 export default function Timeline() {
   const { activeFamily } = useFamily()
   const [entries, setEntries] = useState<Entry[]>([])
+  const [members, setMembers] = useState<FamilyMemberInfo[]>([])
   const [loading, setLoading] = useState(true)
   const [categoryFilter, setCategoryFilter] = useState<Category | 'All'>('All')
   const [followUpOnly, setFollowUpOnly] = useState(false)
@@ -19,6 +20,12 @@ export default function Timeline() {
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null)
 
   const familyId = activeFamily?.familyId
+
+  const memberByUserId = useMemo(() => {
+    const map = new Map<string, FamilyMemberInfo>()
+    for (const m of members) map.set(m.userId, m)
+    return map
+  }, [members])
 
   const loadEntries = useCallback(async () => {
     if (!familyId) return
@@ -40,6 +47,13 @@ export default function Timeline() {
   useEffect(() => {
     loadEntries()
   }, [loadEntries])
+
+  useEffect(() => {
+    if (!familyId) return
+    loadFamilyMembers(familyId)
+      .then(setMembers)
+      .catch((err) => console.error('Failed to load family members', err))
+  }, [familyId])
 
   useEffect(() => {
     if (!familyId) return
@@ -80,6 +94,7 @@ export default function Timeline() {
       notes: draft.notes,
       reference_number: draft.reference_number || null,
       follow_up: draft.follow_up || null,
+      assigned_to: draft.assigned_to || null,
     }
     let entryId: string
     if (editingEntry) {
@@ -126,9 +141,7 @@ export default function Timeline() {
   }
 
   return (
-    <div className="min-h-screen pb-28">
-      <Header />
-
+    <div className="pb-28">
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-5 space-y-4">
         {openFollowUps.length > 0 && (
           <FollowUpBanner
@@ -156,6 +169,7 @@ export default function Timeline() {
               <EntryCard
                 key={entry.id}
                 entry={entry}
+                assignee={entry.assigned_to ? memberByUserId.get(entry.assigned_to) ?? null : null}
                 onEdit={() => {
                   setEditingEntry(entry)
                   setFormOpen(true)
@@ -184,6 +198,7 @@ export default function Timeline() {
       {formOpen && (
         <EntryForm
           initial={editingEntry ?? undefined}
+          members={members}
           onCancel={() => {
             setFormOpen(false)
             setEditingEntry(null)

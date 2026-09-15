@@ -26,9 +26,7 @@ export default function Header() {
               {activeFamily.familyName}
               {memberships.length > 1 && <span className="text-ink-soft text-xs ml-1">▾</span>}
             </button>
-            <p className="text-xs text-ink-soft truncate">
-              {activeFamily.parentName ? `Caring for ${activeFamily.parentName}` : 'Family care log'}
-            </p>
+            <p className="text-[10px] tracking-wide text-ink-soft/70 uppercase truncate">CareCrew by Third Act Exchange</p>
             {switcherOpen && memberships.length > 1 && (
               <div className="absolute top-full left-0 mt-1 bg-white border border-line rounded-lg shadow-md py-1 min-w-[180px] z-20">
                 {memberships.map((m) => (
@@ -76,7 +74,7 @@ export default function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="font-serif font-semibold text-lg mb-1">Invite family</h2>
-            <p className="text-sm text-ink-soft mb-4">Share this code so they can join "{activeFamily.familyName}".</p>
+            <p className="text-sm text-ink-soft mb-4">Share this code so they can join {activeFamily.familyName}'s care log.</p>
             <p className="font-serif text-3xl font-semibold tracking-wide text-accent mb-5">
               {activeFamily.joinCode}
             </p>

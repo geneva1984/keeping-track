@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import type { Entry } from '../types'
+import type { Entry, FamilyMemberInfo } from '../types'
 import AttachmentThumb from './AttachmentThumb'
 
 interface Props {
   entry: Entry
+  assignee: FamilyMemberInfo | null
   onEdit: () => void
   onDelete: () => void
   onToggleFollowUp: () => void
@@ -17,7 +18,7 @@ function formatDate(iso: string) {
   })
 }
 
-export default function EntryCard({ entry, onEdit, onDelete, onToggleFollowUp }: Props) {
+export default function EntryCard({ entry, assignee, onEdit, onDelete, onToggleFollowUp }: Props) {
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const hasOpenFollowUp = !!entry.follow_up && !entry.follow_up_resolved
 
@@ -89,6 +90,12 @@ export default function EntryCard({ entry, onEdit, onDelete, onToggleFollowUp }:
             >
               {entry.follow_up}
             </p>
+            {assignee && (
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: assignee.color }} />
+                <span className="text-xs text-ink-soft">{assignee.displayName}</span>
+              </div>
+            )}
           </div>
           <button
             onClick={onToggleFollowUp}

@@ -1,10 +1,11 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
-import { CATEGORIES, type Attachment, type Category, type Entry, type EntryDraft } from '../types'
+import { CATEGORIES, type Attachment, type Category, type Entry, type EntryDraft, type FamilyMemberInfo } from '../types'
 import AttachmentThumb from './AttachmentThumb'
 import CameraCapture from './CameraCapture'
 
 interface Props {
   initial?: Entry
+  members: FamilyMemberInfo[]
   onCancel: () => void
   onSave: (draft: EntryDraft, newFiles: File[]) => Promise<void>
   onDeleteAttachment?: (attachment: Attachment) => Promise<void>
@@ -26,7 +27,7 @@ function loadDraft(): EntryDraft | null {
   }
 }
 
-export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachment }: Props) {
+export default function EntryForm({ initial, members, onCancel, onSave, onDeleteAttachment }: Props) {
   const draft = initial ? null : loadDraft()
   const [entryDate, setEntryDate] = useState(initial?.entry_date ?? draft?.entry_date ?? today())
   const [category, setCategory] = useState<Category>(initial?.category ?? draft?.category ?? CATEGORIES[0])
@@ -34,6 +35,7 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
   const [notes, setNotes] = useState(initial?.notes ?? draft?.notes ?? '')
   const [referenceNumber, setReferenceNumber] = useState(initial?.reference_number ?? draft?.reference_number ?? '')
   const [followUp, setFollowUp] = useState(initial?.follow_up ?? draft?.follow_up ?? '')
+  const [assignedTo, setAssignedTo] = useState(initial?.assigned_to ?? draft?.assigned_to ?? '')
   const [newFiles, setNewFiles] = useState<File[]>([])
   const [existingAttachments, setExistingAttachments] = useState(initial?.attachments ?? [])
   const [saving, setSaving] = useState(false)
@@ -51,9 +53,10 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
       notes,
       reference_number: referenceNumber,
       follow_up: followUp,
+      assigned_to: assignedTo,
     }
     localStorage.setItem(DRAFT_KEY, JSON.stringify(toSave))
-  }, [initial, entryDate, category, contact, notes, referenceNumber, followUp])
+  }, [initial, entryDate, category, contact, notes, referenceNumber, followUp, assignedTo])
 
   function handleFilePick(e: ChangeEvent<HTMLInputElement>) {
     const picked = Array.from(e.target.files ?? [])
@@ -104,6 +107,7 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
           notes: notes.trim(),
           reference_number: referenceNumber.trim(),
           follow_up: followUp.trim(),
+          assigned_to: assignedTo,
         },
         newFiles,
       )
@@ -200,6 +204,22 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
               placeholder="e.g. Call back Thursday about assessment date"
               className="w-full rounded-lg border border-line px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Assign follow-up to (optional)</label>
+            <select
+              value={assignedTo}
+              onChange={(e) => setAssignedTo(e.target.value)}
+              className="w-full rounded-lg border border-line px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
+            >
+              <option value="">Unassigned</option>
+              {members.map((m) => (
+                <option key={m.userId} value={m.userId}>
+                  {m.displayName}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

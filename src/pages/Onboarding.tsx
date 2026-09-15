@@ -8,8 +8,7 @@ export default function Onboarding() {
   const { createFamily, joinFamily } = useFamily()
   const [mode, setMode] = useState<Mode>('choose')
   const [displayName, setDisplayName] = useState('')
-  const [familyName, setFamilyName] = useState('')
-  const [parentName, setParentName] = useState('')
+  const [recipientName, setRecipientName] = useState('')
   const [joinCode, setJoinCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -19,7 +18,7 @@ export default function Onboarding() {
     setError(null)
     setBusy(true)
     try {
-      await createFamily(familyName.trim(), parentName.trim(), displayName.trim())
+      await createFamily(recipientName.trim(), recipientName.trim(), displayName.trim())
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
@@ -85,17 +84,11 @@ export default function Onboarding() {
               <form onSubmit={handleCreate} className="space-y-3">
                 <Field label="Your name" value={displayName} onChange={setDisplayName} placeholder="e.g. Sam" required />
                 <Field
-                  label="Family / log name"
-                  value={familyName}
-                  onChange={setFamilyName}
-                  placeholder="e.g. Mum's care"
-                  required
-                />
-                <Field
-                  label="Parent's name (optional)"
-                  value={parentName}
-                  onChange={setParentName}
+                  label="Who is this log for?"
+                  value={recipientName}
+                  onChange={setRecipientName}
                   placeholder="e.g. Margaret"
+                  required
                 />
                 {error && <p className="text-sm text-warn">{error}</p>}
                 <button

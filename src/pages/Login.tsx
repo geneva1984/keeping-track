@@ -26,13 +26,16 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
-        <div className="flex items-center gap-2 mb-8 justify-center">
-          <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-              <path d="M6 12.5 L10 16.5 L18 7.5" stroke="#F6F3EC" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+        <div className="flex flex-col items-center gap-2 mb-8">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+                <path d="M6 12.5 L10 16.5 L18 7.5" stroke="#F6F3EC" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <span className="font-serif text-xl font-semibold text-ink">CareCrew</span>
           </div>
-          <span className="font-serif text-xl font-semibold text-ink">Keeping Track</span>
+          <span className="text-[10px] tracking-wide text-ink-soft/70 uppercase">by Third Act Exchange</span>
         </div>
 
         <div className="bg-panel border border-line rounded-2xl p-7 shadow-sm">

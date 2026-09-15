@@ -1,8 +1,21 @@
+import { useState } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { FamilyProvider, useFamily } from './context/FamilyContext'
 import Login from './pages/Login'
 import Onboarding from './pages/Onboarding'
 import Timeline from './pages/Timeline'
+import Handbook from './pages/Handbook'
+import CalendarPage from './pages/Calendar'
+import Actions from './pages/Actions'
+import Header from './components/Header'
+import TabNav, { VIEWS, type View } from './components/TabNav'
+
+const ACTIVE_VIEW_KEY = 'keeping-track:active-view'
+
+function loadActiveView(): View {
+  const stored = localStorage.getItem(ACTIVE_VIEW_KEY)
+  return (VIEWS.find((v) => v === stored) as View) ?? 'handbook'
+}
 
 function Gate() {
   const { session, loading: authLoading } = useAuth()
@@ -19,10 +32,28 @@ function Gate() {
 
 function FamilyGate() {
   const { loading, activeFamily } = useFamily()
+  const [view, setViewState] = useState<View>(loadActiveView)
+
+  function setView(next: View) {
+    localStorage.setItem(ACTIVE_VIEW_KEY, next)
+    setViewState(next)
+  }
 
   if (loading) return <FullScreenLoader />
   if (!activeFamily) return <Onboarding />
-  return <Timeline />
+
+  return (
+    <div className="min-h-screen">
+      <div className="print:hidden">
+        <Header />
+        <TabNav value={view} onChange={setView} />
+      </div>
+      {view === 'timeline' && <Timeline />}
+      {view === 'handbook' && <Handbook />}
+      {view === 'calendar' && <CalendarPage />}
+      {view === 'actions' && <Actions />}
+    </div>
+  )
 }
 
 function FullScreenLoader() {
