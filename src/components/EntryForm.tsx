@@ -1,6 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { CATEGORIES, type Attachment, type Category, type Entry, type EntryDraft } from '../types'
 import AttachmentThumb from './AttachmentThumb'
+import CameraCapture from './CameraCapture'
 
 interface Props {
   initial?: Entry
@@ -37,6 +38,7 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
   const [existingAttachments, setExistingAttachments] = useState(initial?.attachments ?? [])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [cameraOpen, setCameraOpen] = useState(false)
 
   // Only new (unsaved) entries keep a draft — an in-progress edit of an
   // existing entry always starts from that entry's real saved values.
@@ -67,6 +69,16 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
 
   function removeNewFile(index: number) {
     setNewFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  function handleCameraCapture(file: File) {
+    setCameraOpen(false)
+    if (file.size > MAX_FILE_BYTES) {
+      setError('That photo is over the 10MB limit')
+      return
+    }
+    setError(null)
+    setNewFiles((prev) => [...prev, file])
   }
 
   async function handleRemoveExisting(attachment: Attachment) {
@@ -217,6 +229,22 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
                   </button>
                 </div>
               ))}
+              <button
+                type="button"
+                onClick={() => setCameraOpen(true)}
+                className="w-16 h-16 rounded-lg border border-dashed border-line flex flex-col items-center justify-center gap-0.5 text-ink-soft hover:border-accent/50 hover:text-accent cursor-pointer transition-colors"
+              >
+                <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+                  <path
+                    d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1-2h7l1 2h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5v-9Z"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="12" cy="13" r="3.2" stroke="currentColor" strokeWidth="1.6" />
+                </svg>
+                <span className="text-[9px] leading-none">Camera</span>
+              </button>
               <label className="w-16 h-16 rounded-lg border border-dashed border-line flex items-center justify-center text-ink-soft hover:border-accent/50 hover:text-accent cursor-pointer transition-colors">
                 <span className="text-2xl leading-none">+</span>
                 <input
@@ -250,6 +278,8 @@ export default function EntryForm({ initial, onCancel, onSave, onDeleteAttachmen
           </div>
         </form>
       </div>
+
+      {cameraOpen && <CameraCapture onCapture={handleCameraCapture} onClose={() => setCameraOpen(false)} />}
     </div>
   )
 }
