@@ -57,8 +57,8 @@ export default function Login() {
             <>
               <h1 className="font-serif text-xl font-semibold mb-1">Welcome</h1>
               <p className="text-sm text-ink-soft mb-6 leading-relaxed">
-                One running record of every call, email, and visit with My Aged Care and other providers — shared
-                with your family.
+                Everything your family needs to coordinate a loved one's care — a shared handbook, calendar, to do
+                list, and running log — all in one place.
               </p>
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>

@@ -9,6 +9,7 @@ import AssigneeFilter from '../components/calendar/AssigneeFilter'
 import FollowUpItem from '../components/todos/FollowUpItem'
 import TodoItem from '../components/todos/TodoItem'
 import TodoForm from '../components/todos/TodoForm'
+import PageIntro from '../components/PageIntro'
 
 export default function Actions() {
   const { activeFamily } = useFamily()
@@ -124,6 +125,11 @@ export default function Actions() {
   return (
     <div className="pb-28">
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-5 space-y-6">
+        <PageIntro>
+          Open follow-ups from the Logbook show up here automatically. Add your own to do items below and assign
+          them to anyone in the family.
+        </PageIntro>
+
         {loading ? (
           <p className="text-sm text-ink-soft text-center py-10">Loading…</p>
         ) : (

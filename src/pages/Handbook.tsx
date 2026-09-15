@@ -5,6 +5,7 @@ import { useFamily } from '../context/FamilyContext'
 import type { CareHandbook, HandbookColumn } from '../types'
 import SectionNav, { type SectionInfo } from '../components/handbook/SectionNav'
 import PrintView from '../components/handbook/PrintView'
+import PageIntro from '../components/PageIntro'
 import AboutSection from '../components/handbook/AboutSection'
 import ClinicalSection from '../components/handbook/ClinicalSection'
 import EmergencySection from '../components/handbook/EmergencySection'
@@ -176,9 +177,14 @@ export default function Handbook() {
   return (
     <>
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-5 space-y-4 print:hidden">
+        <PageIntro>
+          Fill in as much as you can — every family member can view and edit any section here, and changes save
+          automatically as you go.
+        </PageIntro>
+
         <div className="flex items-center justify-between gap-3 px-1">
           <span className="text-xs text-ink-soft min-w-0 truncate">
-            {handbook.updated_by_name ? `Last edited by ${handbook.updated_by_name}` : 'A shared, living record — anyone in the family can edit it'}
+            {handbook.updated_by_name ? `Last edited by ${handbook.updated_by_name}` : 'Nobody has edited this yet'}
           </span>
           <span className="text-xs text-ink-soft shrink-0">
             {saveState === 'saving' && 'Saving…'}

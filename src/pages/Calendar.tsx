@@ -7,6 +7,7 @@ import type { Appointment, AppointmentDraft, FamilyMemberInfo } from '../types'
 import AssigneeFilter from '../components/calendar/AssigneeFilter'
 import AppointmentCard from '../components/calendar/AppointmentCard'
 import AppointmentForm from '../components/calendar/AppointmentForm'
+import PageIntro from '../components/PageIntro'
 
 function startOfToday() {
   const d = new Date()
@@ -127,6 +128,11 @@ export default function CalendarPage() {
   return (
     <div className="pb-28">
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-5 space-y-4">
+        <PageIntro>
+          Add appointments and assign whoever's taking the lead — everyone in the family sees the same
+          colour-coded calendar.
+        </PageIntro>
+
         <AssigneeFilter members={members} value={assigneeFilter} onChange={setAssigneeFilter} />
 
         <button

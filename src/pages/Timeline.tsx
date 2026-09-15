@@ -8,6 +8,7 @@ import CategoryFilter from '../components/CategoryFilter'
 import FollowUpBanner from '../components/FollowUpBanner'
 import EntryCard from '../components/EntryCard'
 import EntryForm from '../components/EntryForm'
+import PageIntro from '../components/PageIntro'
 
 export default function Timeline() {
   const { activeFamily } = useFamily()
@@ -143,6 +144,11 @@ export default function Timeline() {
   return (
     <div className="pb-28">
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-5 space-y-4">
+        <PageIntro>
+          Log every call, email, and visit with providers here — the whole family sees the same running record, in
+          order.
+        </PageIntro>
+
         {openFollowUps.length > 0 && (
           <FollowUpBanner
             count={openFollowUps.length}
