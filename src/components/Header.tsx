@@ -55,6 +55,9 @@ export default function Header() {
           >
             Invite
           </button>
+          <a href="#privacy" className="text-xs text-ink-soft hover:text-ink px-1 py-1.5">
+            Privacy
+          </a>
           <button
             onClick={() => supabase.auth.signOut()}
             className="text-xs text-ink-soft hover:text-ink px-2 py-1.5"

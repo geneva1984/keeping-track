@@ -26,6 +26,16 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
+        <div className="rounded-lg bg-gold-soft border border-gold/30 px-4 py-3 mb-6">
+          <p className="text-sm text-ink leading-relaxed text-center">
+            <strong>This is an early test version of CareCrew.</strong> We're still finalising our data security
+            and privacy practices, so please use placeholder names and general descriptions rather than real
+            medical, financial, or identifying details about your parents for now — data may be reset or removed
+            as we continue building. By continuing, you understand this is a test build and agree not to enter
+            real sensitive information about your parents at this stage.
+          </p>
+        </div>
+
         <div className="flex flex-col items-center gap-2 mb-8">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center">
@@ -91,6 +101,12 @@ export default function Login() {
             </>
           )}
         </div>
+
+        <p className="text-center mt-5">
+          <a href="#privacy" className="text-xs text-ink-soft hover:text-ink underline underline-offset-2">
+            Privacy Policy
+          </a>
+        </p>
       </div>
     </div>
   )

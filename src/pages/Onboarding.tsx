@@ -78,9 +78,18 @@ export default function Onboarding() {
                 ← Back
               </button>
               <h1 className="font-serif text-xl font-semibold mb-1">Create a family log</h1>
-              <p className="text-sm text-ink-soft mb-5 leading-relaxed">
+              <p className="text-sm text-ink-soft mb-4 leading-relaxed">
                 You'll get a short code afterwards to invite the rest of the family.
               </p>
+              <div className="rounded-lg bg-gold-soft border border-gold/30 px-3.5 py-3 mb-5">
+                <p className="text-xs text-ink leading-relaxed">
+                  <strong>This is an early test version of CareCrew.</strong> We're still finalising our data
+                  security and privacy practices, so please use placeholder names and general descriptions rather
+                  than real medical, financial, or identifying details about your parents for now — data may be
+                  reset or removed as we continue building. By continuing, you understand this is a test build and
+                  agree not to enter real sensitive information about your parents at this stage.
+                </p>
+              </div>
               <form onSubmit={handleCreate} className="space-y-3">
                 <Field label="Your name" value={displayName} onChange={setDisplayName} placeholder="e.g. Sam" required />
                 <Field

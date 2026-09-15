@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { FamilyProvider, useFamily } from './context/FamilyContext'
 import Login from './pages/Login'
@@ -7,8 +7,19 @@ import Timeline from './pages/Timeline'
 import Handbook from './pages/Handbook'
 import CalendarPage from './pages/Calendar'
 import Actions from './pages/Actions'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 import Header from './components/Header'
 import TabNav, { VIEWS, type View } from './components/TabNav'
+
+function useHashRoute() {
+  const [hash, setHash] = useState(window.location.hash)
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash)
+    window.addEventListener('hashchange', onChange)
+    return () => window.removeEventListener('hashchange', onChange)
+  }, [])
+  return hash
+}
 
 const ACTIVE_VIEW_KEY = 'keeping-track:active-view'
 
@@ -65,6 +76,9 @@ function FullScreenLoader() {
 }
 
 export default function App() {
+  const hash = useHashRoute()
+  if (hash === '#privacy') return <PrivacyPolicy />
+
   return (
     <AuthProvider>
       <Gate />
